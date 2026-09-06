@@ -1,9 +1,13 @@
-interface NavBarProps {
-  activePage: "home" | "settings";
-  onNavigate: (page: "home" | "settings") => void;
-}
+import { NavLink } from "react-router-dom";
 
-export function NavBar({ activePage, onNavigate }: NavBarProps) {
+const LINKS = [
+  { to: "/", label: "Home" },
+  { to: "/globe", label: "Globe" },
+  { to: "/explore", label: "Explore" },
+  { to: "/settings", label: "Settings" },
+];
+
+export function NavBar() {
   return (
     <nav
       className="glass-panel"
@@ -13,20 +17,25 @@ export function NavBar({ activePage, onNavigate }: NavBarProps) {
         padding: "0.75rem 1.25rem",
         margin: "1rem",
         alignItems: "center",
+        flexWrap: "wrap",
       }}
     >
       <span className="accent-text" style={{ fontWeight: 700, marginRight: "auto" }}>
         RawFeed
       </span>
-      <button onClick={() => onNavigate("home")} style={{ fontWeight: activePage === "home" ? 700 : 400 }}>
-        Home
-      </button>
-      <button
-        onClick={() => onNavigate("settings")}
-        style={{ fontWeight: activePage === "settings" ? 700 : 400 }}
-      >
-        Settings
-      </button>
+      {LINKS.map((link) => (
+        <NavLink
+          key={link.to}
+          to={link.to}
+          style={({ isActive }) => ({
+            fontWeight: isActive ? 700 : 400,
+            textDecoration: "none",
+            color: "var(--color-text)",
+          })}
+        >
+          {link.label}
+        </NavLink>
+      ))}
     </nav>
   );
 }

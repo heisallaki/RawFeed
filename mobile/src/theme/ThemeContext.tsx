@@ -56,3 +56,5 @@ export function useTheme(): ThemeContextValue {
   }
   return context;
 }
+
+export { AccentColor, ThemeMode };
