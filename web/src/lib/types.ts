@@ -25,12 +25,13 @@ export interface RawFeedEvent {
   summary: string;
   category: EventCategory;
   status: EventStatus;
-  country: string;
+  country: string | null;
   county: string | null;
   importance_score: number;
   importance_reasons: string[];
   confidence_score: number;
   why_it_matters: string | null;
+  ai_enriched: boolean;
   what_we_know: string[];
   what_we_dont_know: string[];
   first_reported_at: string;
@@ -48,4 +49,5 @@ export interface NewsSourceSummary {
   credibility_tier: string;
   county_scope: string | null;
   is_active: boolean;
+  verify_ssl: boolean;
 }

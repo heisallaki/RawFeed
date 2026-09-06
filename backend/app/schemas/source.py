@@ -12,3 +12,4 @@ class SourceRead(BaseModel):
     credibility_tier: str
     county_scope: str | None
     is_active: bool
+    verify_ssl: bool

@@ -2,22 +2,34 @@ import hashlib
 from datetime import datetime, timezone
 
 import feedparser
+import httpx
 from sqlalchemy.orm import Session
 
 from app.models.article import RawArticle
 from app.models.event import Event
 from app.models.source import NewsSource
-from app.services.ai import generate_why_it_matters
+from app.services.ai import fallback_why_it_matters
 from app.services.classification import classify_category
 from app.services.clustering import find_matching_event
 from app.services.geography import extract_county
 from app.services.importance import score_confidence, score_importance
+from app.services.text_clean import strip_html
+from app.services.url_utils import extract_article_url
+
+FEED_TIMEOUT_SECONDS = 10.0
 
 
 def parse_published_at(entry) -> datetime | None:
     if getattr(entry, "published_parsed", None):
         return datetime(*entry.published_parsed[:6], tzinfo=timezone.utc)
     return None
+
+
+def fetch_feed_bytes(source: NewsSource) -> bytes:
+    with httpx.Client(timeout=FEED_TIMEOUT_SECONDS, follow_redirects=True, verify=source.verify_ssl) as client:
+        response = client.get(source.feed_url)
+        response.raise_for_status()
+        return response.content
 
 
 def run_ingestion(db: Session) -> dict:
@@ -29,15 +41,31 @@ def run_ingestion(db: Session) -> dict:
 
     for source in sources:
         source_result = {"source_name": source.name, "new_articles": 0, "new_events": 0, "errors": []}
-        try:
-            parsed_feed = feedparser.parse(source.feed_url)
-            if parsed_feed.bozo and not parsed_feed.entries:
-                source_result["errors"].append(str(parsed_feed.bozo_exception))
-                results.append(source_result)
-                continue
 
-            for entry in parsed_feed.entries:
-                url = entry.get("link")
+        try:
+            feed_bytes = fetch_feed_bytes(source)
+        except httpx.TimeoutException:
+            source_result["errors"].append(f"Timed out after {FEED_TIMEOUT_SECONDS}s fetching feed")
+            results.append(source_result)
+            continue
+        except httpx.HTTPStatusError as error:
+            source_result["errors"].append(f"HTTP error {error.response.status_code} fetching feed")
+            results.append(source_result)
+            continue
+        except httpx.RequestError as error:
+            source_result["errors"].append(f"Network error fetching feed: {error}")
+            results.append(source_result)
+            continue
+
+        parsed_feed = feedparser.parse(feed_bytes)
+        if parsed_feed.bozo and not parsed_feed.entries:
+            source_result["errors"].append(str(parsed_feed.bozo_exception))
+            results.append(source_result)
+            continue
+
+        for entry in parsed_feed.entries:
+            try:
+                url = extract_article_url(entry)
                 if not url:
                     continue
 
@@ -45,16 +73,18 @@ def run_ingestion(db: Session) -> dict:
                 if existing:
                     continue
 
-                title = entry.get("title", "").strip()
+                title = strip_html(entry.get("title", "")).strip()
                 if not title:
                     continue
 
-                raw_summary = entry.get("summary", "")
+                raw_summary = strip_html(entry.get("summary", ""))
                 combined_text = f"{title} {raw_summary}".lower()
                 content_hash = hashlib.sha256(f"{title}{url}".encode("utf-8")).hexdigest()
 
                 category = classify_category(combined_text)
                 county = extract_county(combined_text)
+                country = "Kenya" if county else None
+                event_summary = raw_summary[:500]
 
                 article = RawArticle(
                     source_id=source.id,
@@ -73,15 +103,16 @@ def run_ingestion(db: Session) -> dict:
                 if event is None:
                     event = Event(
                         title=title,
-                        summary=raw_summary[:500],
+                        summary=event_summary,
                         category=category,
                         status="developing",
-                        country="Kenya",
+                        country=country,
                         county=county,
                         importance_score=0,
                         importance_reasons=[],
                         confidence_score=0,
-                        why_it_matters=None,
+                        why_it_matters=fallback_why_it_matters(title, category, county, event_summary),
+                        ai_enriched=False,
                         what_we_know=[title],
                         what_we_dont_know=["Full details are still developing."],
                         first_reported_at=now,
@@ -93,6 +124,8 @@ def run_ingestion(db: Session) -> dict:
                     total_new_events += 1
                 else:
                     event.last_updated_at = now
+                    if country and not event.country:
+                        event.country = country
                     if title not in (event.what_we_know or []):
                         event.what_we_know = (event.what_we_know or []) + [title]
 
@@ -116,16 +149,13 @@ def run_ingestion(db: Session) -> dict:
                 event.confidence_score = confidence_score
                 event.status = "confirmed" if article_count >= 2 else "developing"
 
-                if not event.why_it_matters:
-                    event.why_it_matters = generate_why_it_matters(event.title, category, county, event.summary)
-
                 db.commit()
                 source_result["new_articles"] += 1
                 total_new_articles += 1
 
-        except Exception as error:
-            db.rollback()
-            source_result["errors"].append(str(error))
+            except Exception as error:
+                db.rollback()
+                source_result["errors"].append(f"Error processing entry: {error}")
 
         results.append(source_result)
 

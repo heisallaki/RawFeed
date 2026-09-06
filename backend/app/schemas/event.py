@@ -18,12 +18,13 @@ class EventRead(BaseModel):
     summary: str
     category: str
     status: str
-    country: str
+    country: str | None
     county: str | None
     importance_score: int
     importance_reasons: list[str]
     confidence_score: int
     why_it_matters: str | None
+    ai_enriched: bool
     what_we_know: list[str]
     what_we_dont_know: list[str]
     first_reported_at: datetime
