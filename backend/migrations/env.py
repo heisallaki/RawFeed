@@ -9,6 +9,9 @@ from app.config import get_settings
 from app.database import Base
 from app.models.user import User
 from app.models.preferences import UserPreferences
+from app.models.source import NewsSource
+from app.models.event import Event
+from app.models.article import RawArticle
 
 config = context.config
 config.set_main_option("sqlalchemy.url", get_settings().DATABASE_URL)

@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_MINUTES: int = 43200
     CORS_ORIGINS: str = "http://localhost:5173"
     ENVIRONMENT: str = "development"
+    OLLAMA_HOST: str = "http://localhost:11434"
+    OLLAMA_MODEL: str = "llama3.2:1b"
 
     @property
     def cors_origins_list(self) -> list[str]:
