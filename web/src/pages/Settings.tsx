@@ -8,7 +8,7 @@ const THEME_MODES: ThemeMode[] = ["light", "dark", "system"];
 const ACCENT_OPTIONS = Object.keys(ACCENT_COLORS) as AccentColor[];
 
 function AccountPanel() {
-  const { user, accessToken, logout } = useAuth();
+  const { user, authFetch, logout } = useAuth();
   const navigate = useNavigate();
   const [stage, setStage] = useState<"idle" | "code-sent">("idle");
   const [code, setCode] = useState("");
@@ -16,14 +16,14 @@ function AccountPanel() {
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
-  if (!user || !accessToken) return null;
+  if (!user) return null;
 
   const handleRequestDeletion = async () => {
     setError(null);
     setMessage(null);
     setSubmitting(true);
     try {
-      const result = await requestAccountDeletion(accessToken);
+      const result = await requestAccountDeletion(authFetch);
       setMessage(result.message);
       setStage("code-sent");
     } catch (err) {
@@ -37,7 +37,7 @@ function AccountPanel() {
     setError(null);
     setSubmitting(true);
     try {
-      await confirmAccountDeletion(accessToken, code);
+      await confirmAccountDeletion(authFetch, code);
       logout();
       navigate("/");
     } catch (err) {
@@ -56,14 +56,24 @@ function AccountPanel() {
       <p style={{ color: "var(--color-text-muted)" }}>
         This permanently deletes your account and all associated data. This action cannot be undone.
       </p>
-      {error && <p role="alert" style={{ color: "#ef4444" }}>{error}</p>}
+      {error && (
+        <p role="alert" style={{ color: "#ef4444" }}>
+          {error}
+        </p>
+      )}
       {message && <p style={{ color: "var(--color-text-muted)" }}>{message}</p>}
 
       {stage === "idle" ? (
         <button
           onClick={handleRequestDeletion}
           disabled={submitting}
-          style={{ padding: "0.6rem 1.2rem", borderRadius: "8px", border: "1px solid #ef4444", color: "#ef4444", background: "none" }}
+          style={{
+            padding: "0.6rem 1.2rem",
+            borderRadius: "8px",
+            border: "1px solid #ef4444",
+            color: "#ef4444",
+            background: "none",
+          }}
         >
           {submitting ? "Sending code..." : "Delete account"}
         </button>

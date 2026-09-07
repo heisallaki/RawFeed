@@ -21,20 +21,24 @@ export default function App() {
       <ThemeProvider>
         <ErrorBoundary>
           <BrowserRouter>
-            <NavBar />
-            <Routes>
-              <Route path="/" element={<Home />} />
-              <Route path="/globe" element={<Globe />} />
-              <Route path="/explore" element={<Explore />} />
-              <Route path="/events/:id" element={<EventDetail />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/login" element={<Login />} />
-              <Route path="/register" element={<Register />} />
-              <Route path="/verify-email" element={<VerifyEmail />} />
-              <Route path="/forgot-password" element={<ForgotPassword />} />
-              <Route path="/reset-password" element={<ResetPassword />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
+            <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
+              <NavBar />
+              <div style={{ flex: "1 1 auto", display: "flex", flexDirection: "column" }}>
+                <Routes>
+                  <Route path="/" element={<Home />} />
+                  <Route path="/globe" element={<Globe />} />
+                  <Route path="/explore" element={<Explore />} />
+                  <Route path="/events/:id" element={<EventDetail />} />
+                  <Route path="/settings" element={<Settings />} />
+                  <Route path="/login" element={<Login />} />
+                  <Route path="/register" element={<Register />} />
+                  <Route path="/verify-email" element={<VerifyEmail />} />
+                  <Route path="/forgot-password" element={<ForgotPassword />} />
+                  <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="*" element={<NotFound />} />
+                </Routes>
+              </div>
+            </div>
           </BrowserRouter>
         </ErrorBoundary>
       </ThemeProvider>

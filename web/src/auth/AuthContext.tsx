@@ -1,6 +1,10 @@
 import { createContext, useContext, useEffect, useMemo, useState, ReactNode } from "react";
 import { AuthUser, fetchCurrentUser, loginUser, refreshTokens, registerUser } from "../lib/authApi";
 
+const API_URL = (import.meta as ImportMeta & {
+  env: { VITE_API_URL?: string };
+}).env.VITE_API_URL ?? "";
+
 interface AuthContextValue {
   user: AuthUser | null;
   accessToken: string | null;
@@ -9,6 +13,7 @@ interface AuthContextValue {
   register: (email: string, password: string) => Promise<void>;
   logout: () => void;
   setUser: (user: AuthUser) => void;
+  authFetch: (path: string, options?: RequestInit) => Promise<Response>;
 }
 
 const AuthContext = createContext<AuthContextValue | undefined>(undefined);
@@ -31,6 +36,38 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null);
   };
 
+  const persistTokens = (tokens: { access_token: string; refresh_token: string }) => {
+    localStorage.setItem("rawfeed_access_token", tokens.access_token);
+    localStorage.setItem("rawfeed_refresh_token", tokens.refresh_token);
+    setAccessToken(tokens.access_token);
+    setRefreshToken(tokens.refresh_token);
+  };
+
+  const authFetch = async (path: string, options: RequestInit = {}): Promise<Response> => {
+    const doFetch = (token: string | null) =>
+      fetch(`${API_URL}${path}`, {
+        ...options,
+        headers: {
+          ...(options.headers || {}),
+          ...(token ? { Authorization: `Bearer ${token}` } : {}),
+        },
+      });
+
+    let response = await doFetch(accessToken);
+
+    if (response.status === 401 && refreshToken) {
+      try {
+        const tokens = await refreshTokens(refreshToken);
+        persistTokens(tokens);
+        response = await doFetch(tokens.access_token);
+      } catch {
+        clearSession();
+      }
+    }
+
+    return response;
+  };
+
   useEffect(() => {
     async function loadUser() {
       if (!accessToken) {
@@ -44,10 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         if (refreshToken) {
           try {
             const tokens = await refreshTokens(refreshToken);
-            localStorage.setItem("rawfeed_access_token", tokens.access_token);
-            localStorage.setItem("rawfeed_refresh_token", tokens.refresh_token);
-            setAccessToken(tokens.access_token);
-            setRefreshToken(tokens.refresh_token);
+            persistTokens(tokens);
             const currentUser = await fetchCurrentUser(tokens.access_token);
             setUser(currentUser);
           } catch {
@@ -65,10 +99,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     const tokens = await loginUser(email, password);
-    localStorage.setItem("rawfeed_access_token", tokens.access_token);
-    localStorage.setItem("rawfeed_refresh_token", tokens.refresh_token);
-    setAccessToken(tokens.access_token);
-    setRefreshToken(tokens.refresh_token);
+    persistTokens(tokens);
     const currentUser = await fetchCurrentUser(tokens.access_token);
     setUser(currentUser);
   };
@@ -78,8 +109,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const value = useMemo(
-    () => ({ user, accessToken, loading, login, register, logout: clearSession, setUser }),
-    [user, accessToken, loading]
+    () => ({ user, accessToken, loading, login, register, logout: clearSession, setUser, authFetch }),
+    [user, accessToken, refreshToken, loading]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

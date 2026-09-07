@@ -1,4 +1,4 @@
-const API_URL = import.meta.env.VITE_API_URL as string;
+const API_URL = (import.meta as ImportMeta & { env: Record<string, string> }).env.VITE_API_URL;
 
 export interface AuthUser {
   id: string;
@@ -13,6 +13,8 @@ export interface TokenPair {
   refresh_token: string;
   token_type: string;
 }
+
+export type AuthFetch = (path: string, options?: RequestInit) => Promise<Response>;
 
 async function handle<T>(response: Response): Promise<T> {
   if (!response.ok) {
@@ -87,17 +89,16 @@ export function resetPassword(email: string, code: string, newPassword: string):
   }).then((res) => handle<{ message: string }>(res));
 }
 
-export function requestAccountDeletion(accessToken: string): Promise<{ message: string }> {
-  return fetch(`${API_URL}/api/users/me/request-deletion`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${accessToken}` },
-  }).then((res) => handle<{ message: string }>(res));
+export function requestAccountDeletion(authFetch: AuthFetch): Promise<{ message: string }> {
+  return authFetch("/api/users/me/request-deletion", { method: "POST" }).then((res) =>
+    handle<{ message: string }>(res)
+  );
 }
 
-export function confirmAccountDeletion(accessToken: string, code: string): Promise<{ message: string }> {
-  return fetch(`${API_URL}/api/users/me/confirm-deletion`, {
+export function confirmAccountDeletion(authFetch: AuthFetch, code: string): Promise<{ message: string }> {
+  return authFetch("/api/users/me/confirm-deletion", {
     method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+    headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ code }),
   }).then((res) => handle<{ message: string }>(res));
 }
