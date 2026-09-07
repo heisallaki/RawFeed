@@ -1,4 +1,5 @@
-import { NavLink } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../auth/AuthContext";
 
 const LINKS = [
   { to: "/", label: "Home" },
@@ -8,6 +9,9 @@ const LINKS = [
 ];
 
 export function NavBar() {
+  const { user, loading, logout } = useAuth();
+  const navigate = useNavigate();
+
   return (
     <nav
       className="glass-panel"
@@ -36,6 +40,31 @@ export function NavBar() {
           {link.label}
         </NavLink>
       ))}
+      {!loading && (
+        user ? (
+          <>
+            <span style={{ color: "var(--color-text-muted)", fontSize: "0.85rem" }}>{user.email}</span>
+            <button
+              onClick={() => {
+                logout();
+                navigate("/");
+              }}
+              style={{ background: "none", border: "none", color: "var(--color-text)", padding: 0 }}
+            >
+              Log out
+            </button>
+          </>
+        ) : (
+          <>
+            <NavLink to="/login" style={{ textDecoration: "none", color: "var(--color-text)" }}>
+              Log in
+            </NavLink>
+            <NavLink to="/register" style={{ textDecoration: "none", color: "var(--color-text)" }}>
+              Sign up
+            </NavLink>
+          </>
+        )
+      )}
     </nav>
   );
 }

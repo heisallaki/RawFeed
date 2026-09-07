@@ -5,6 +5,9 @@ import { RegionsScreen } from "../screens/RegionsScreen";
 import { ExploreScreen } from "../screens/ExploreScreen";
 import { SettingsScreen } from "../screens/SettingsScreen";
 import { EventDetailScreen } from "../screens/EventDetailScreen";
+import { LoginScreen } from "../screens/LoginScreen";
+import { RegisterScreen } from "../screens/RegisterScreen";
+import { VerifyEmailScreen } from "../screens/VerifyEmailScreen";
 
 const Stack = createNativeStackNavigator();
 
@@ -17,6 +20,9 @@ export function RootNavigator() {
         <Stack.Screen name="Explore" component={ExploreScreen} />
         <Stack.Screen name="Settings" component={SettingsScreen} />
         <Stack.Screen name="EventDetail" component={EventDetailScreen} />
+        <Stack.Screen name="Login" component={LoginScreen} />
+        <Stack.Screen name="Register" component={RegisterScreen} />
+        <Stack.Screen name="VerifyEmail" component={VerifyEmailScreen} />
       </Stack.Navigator>
     </NavigationContainer>
   );

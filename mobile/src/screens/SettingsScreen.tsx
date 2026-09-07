@@ -1,16 +1,52 @@
 import { Pressable, StyleSheet, Text, View } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import { AccentColor, ThemeMode, useTheme } from "../theme/ThemeContext";
 import { ACCENT_COLORS } from "../theme/theme";
 import { AppShell } from "../components/AppShell";
+import { useAuth } from "../auth/AuthContext";
 
 const THEME_MODES: ThemeMode[] = ["light", "dark", "system"];
 const ACCENT_OPTIONS = Object.keys(ACCENT_COLORS) as AccentColor[];
 
 export function SettingsScreen() {
+  const navigation = useNavigation<any>();
   const { palette, themeMode, setThemeMode, accentColor, setAccentColor } = useTheme();
+  const { user, loading, logout } = useAuth();
 
   return (
     <AppShell active="Settings">
+      <View style={[styles.card, { backgroundColor: palette.surface }]}>
+        <Text style={[styles.heading, { color: palette.text }]}>Account</Text>
+        {loading ? (
+          <Text style={{ color: palette.textMuted }}>Loading...</Text>
+        ) : user ? (
+          <View>
+            <Text style={{ color: palette.text, marginBottom: 10 }}>{user.email}</Text>
+            <Pressable
+              onPress={logout}
+              style={[styles.pill, { borderColor: ACCENT_COLORS[accentColor], alignSelf: "flex-start" }]}
+            >
+              <Text style={{ color: palette.text }}>Log out</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <View style={{ flexDirection: "row", gap: 8 }}>
+            <Pressable
+              onPress={() => navigation.navigate("Login")}
+              style={[styles.pill, { borderColor: ACCENT_COLORS[accentColor] }]}
+            >
+              <Text style={{ color: palette.text }}>Log in</Text>
+            </Pressable>
+            <Pressable
+              onPress={() => navigation.navigate("Register")}
+              style={[styles.pill, { borderColor: ACCENT_COLORS[accentColor] }]}
+            >
+              <Text style={{ color: palette.text }}>Sign up</Text>
+            </Pressable>
+          </View>
+        )}
+      </View>
+
       <View style={[styles.card, { backgroundColor: palette.surface }]}>
         <Text style={[styles.heading, { color: palette.text }]}>Appearance</Text>
 

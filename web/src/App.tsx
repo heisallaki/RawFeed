@@ -1,5 +1,6 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import { ThemeProvider } from "./theme/ThemeContext";
+import { AuthProvider } from "./auth/AuthContext";
 import { NavBar } from "./components/NavBar";
 import { ErrorBoundary } from "./components/ErrorBoundary";
 import { Home } from "./pages/Home";
@@ -8,23 +9,31 @@ import { Explore } from "./pages/Explore";
 import { EventDetail } from "./pages/EventDetail";
 import { Settings } from "./pages/Settings";
 import { NotFound } from "./pages/NotFound";
+import { Login } from "./pages/Login";
+import { Register } from "./pages/Register";
+import { VerifyEmail } from "./pages/VerifyEmail";
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <ErrorBoundary>
-        <BrowserRouter>
-          <NavBar />
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/globe" element={<Globe />} />
-            <Route path="/explore" element={<Explore />} />
-            <Route path="/events/:id" element={<EventDetail />} />
-            <Route path="/settings" element={<Settings />} />
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-      </ErrorBoundary>
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider>
+        <ErrorBoundary>
+          <BrowserRouter>
+            <NavBar />
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/globe" element={<Globe />} />
+              <Route path="/explore" element={<Explore />} />
+              <Route path="/events/:id" element={<EventDetail />} />
+              <Route path="/settings" element={<Settings />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/verify-email" element={<VerifyEmail />} />
+              <Route path="*" element={<NotFound />} />
+            </Routes>
+          </BrowserRouter>
+        </ErrorBoundary>
+      </ThemeProvider>
+    </AuthProvider>
   );
 }

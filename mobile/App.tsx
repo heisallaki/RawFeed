@@ -1,5 +1,6 @@
 import { StatusBar } from "expo-status-bar";
 import { ThemeProvider, useTheme } from "./src/theme/ThemeContext";
+import { AuthProvider } from "./src/auth/AuthContext";
 import { RootNavigator } from "./src/navigation/RootNavigator";
 
 function StatusBarWrapper() {
@@ -9,9 +10,11 @@ function StatusBarWrapper() {
 
 export default function App() {
   return (
-    <ThemeProvider>
-      <StatusBarWrapper />
-      <RootNavigator />
-    </ThemeProvider>
+    <AuthProvider>
+      <ThemeProvider>
+        <StatusBarWrapper />
+        <RootNavigator />
+      </ThemeProvider>
+    </AuthProvider>
   );
 }
