@@ -15,6 +15,13 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = "development"
     OLLAMA_HOST: str = "http://localhost:11434"
     OLLAMA_MODEL: str = "llama3.2:1b"
+    REDIS_URL: str = "redis://localhost:6379/0"
+    EMAIL_PROVIDER: str = "console"
+    RESEND_API_KEY: str = ""
+    EMAIL_FROM: str = "RawFeed <onboarding@resend.dev>"
+    OTP_EXPIRE_MINUTES: int = 10
+    OTP_RESEND_COOLDOWN_SECONDS: int = 60
+    OTP_MAX_ATTEMPTS: int = 5
 
     @property
     def cors_origins_list(self) -> list[str]:

@@ -25,6 +25,7 @@ class Event(Base):
     ai_enriched: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     what_we_know: Mapped[list] = mapped_column(JSON, default=list)
     what_we_dont_know: Mapped[list] = mapped_column(JSON, default=list)
+    notified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     first_reported_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     last_updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))

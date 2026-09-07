@@ -36,3 +36,12 @@ class PreferencesUpdate(BaseModel):
     accent_color: str | None = None
     theme_mode: str | None = None
     notification_level: str | None = None
+
+
+class DeviceTokenRegister(BaseModel):
+    expo_push_token: str = Field(min_length=1, max_length=255)
+    platform: str = Field(min_length=1, max_length=16)
+
+
+class DeletionConfirm(BaseModel):
+    code: str = Field(min_length=6, max_length=6)

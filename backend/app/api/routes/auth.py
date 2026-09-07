@@ -3,6 +3,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 from jose import JWTError
 from sqlalchemy.orm import Session
 
+from app.config import get_settings
 from app.core.security import (
     create_access_token,
     create_refresh_token,
@@ -13,10 +14,22 @@ from app.core.security import (
 from app.database import get_db
 from app.models.preferences import UserPreferences
 from app.models.user import User
-from app.schemas.auth import RefreshRequest, Token
+from app.schemas.auth import (
+    EmailVerifyRequest,
+    MessageResponse,
+    PasswordResetConfirm,
+    PasswordResetRequest,
+    RefreshRequest,
+    ResendVerificationRequest,
+    Token,
+)
 from app.schemas.user import UserCreate, UserRead
+from app.services.email_service import send_password_reset_email, send_verification_email
+from app.services.otp import create_otp, verify_otp
+from app.services.rate_limit import check_and_increment
 
 router = APIRouter(prefix="/api/auth", tags=["auth"])
+settings = get_settings()
 
 
 @router.post("/register", response_model=UserRead, status_code=status.HTTP_201_CREATED)
@@ -33,7 +46,63 @@ def register(payload: UserCreate, db: Session = Depends(get_db)):
     db.add(preferences)
     db.commit()
     db.refresh(user)
+
+    code = create_otp(db, user, "email_verification")
+    send_verification_email(user.email, code)
+
     return user
+
+
+@router.post("/verify-email", response_model=UserRead)
+def verify_email(payload: EmailVerifyRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == payload.email).first()
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
+    if user.is_verified:
+        return user
+
+    if not verify_otp(db, user, "email_verification", payload.code):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired code")
+
+    user.is_verified = True
+    db.commit()
+    db.refresh(user)
+    return user
+
+
+@router.post("/resend-verification", response_model=MessageResponse)
+def resend_verification(payload: ResendVerificationRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == payload.email).first()
+    if user is not None and not user.is_verified:
+        rate_limit_key = f"otp:resend-verification:{payload.email}"
+        if check_and_increment(rate_limit_key, max_calls=1, window_seconds=settings.OTP_RESEND_COOLDOWN_SECONDS):
+            code = create_otp(db, user, "email_verification")
+            send_verification_email(user.email, code)
+
+    return MessageResponse(message="If that account exists and is unverified, a new code has been sent.")
+
+
+@router.post("/request-password-reset", response_model=MessageResponse)
+def request_password_reset(payload: PasswordResetRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == payload.email).first()
+    if user is not None:
+        rate_limit_key = f"otp:password-reset:{payload.email}"
+        if check_and_increment(rate_limit_key, max_calls=1, window_seconds=settings.OTP_RESEND_COOLDOWN_SECONDS):
+            code = create_otp(db, user, "password_reset")
+            send_password_reset_email(user.email, code)
+
+    return MessageResponse(message="If that account exists, a password reset code has been sent.")
+
+
+@router.post("/reset-password", response_model=MessageResponse)
+def reset_password(payload: PasswordResetConfirm, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == payload.email).first()
+    if user is None or not verify_otp(db, user, "password_reset", payload.code):
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid or expired code")
+
+    user.hashed_password = hash_password(payload.new_password)
+    db.commit()
+    return MessageResponse(message="Password has been reset. You can now log in with your new password.")
 
 
 @router.post("/login", response_model=Token)

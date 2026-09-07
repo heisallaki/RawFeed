@@ -4,13 +4,14 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.api.routes.auth import router as auth_router
 from app.api.routes.events import router as events_router
 from app.api.routes.ingestion import router as ingestion_router
+from app.api.routes.notifications import router as notifications_router
 from app.api.routes.sources import router as sources_router
 from app.api.routes.users import router as users_router
 from app.config import get_settings
 
 settings = get_settings()
 
-app = FastAPI(title="RawFeed API", version="0.2.0")
+app = FastAPI(title="RawFeed API", version="0.3.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -25,6 +26,7 @@ app.include_router(users_router)
 app.include_router(events_router)
 app.include_router(sources_router)
 app.include_router(ingestion_router)
+app.include_router(notifications_router)
 
 
 @app.get("/")

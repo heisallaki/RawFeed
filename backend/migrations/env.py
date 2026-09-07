@@ -12,6 +12,8 @@ from app.models.preferences import UserPreferences
 from app.models.source import NewsSource
 from app.models.event import Event
 from app.models.article import RawArticle
+from app.models.otp import OTPCode
+from app.models.device_token import DeviceToken
 
 config = context.config
 config.set_main_option("sqlalchemy.url", get_settings().DATABASE_URL)
