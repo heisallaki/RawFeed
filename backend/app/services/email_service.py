@@ -68,3 +68,40 @@ def _send_via_smtp(to: str, subject: str, body: str) -> bool:
     except Exception as error:
         print(f"SMTP send failed (not a credential leak: {type(error).__name__}). Falling back to console output.")
         return _send_via_console(to, subject, body)
+
+
+def send_verification_email(to: str, code: str) -> bool:
+    subject = "Your RawFeed verification code"
+    body = (
+        "RawFeed\n\n"
+        "Verification code\n\n"
+        f"Your RawFeed verification code is:\n\n{code}\n\n"
+        f"This code expires in {settings.OTP_EXPIRE_MINUTES} minutes.\n\n"
+        "If you did not request this code, you can safely ignore this message."
+    )
+    return send_email(to, subject, body)
+
+
+def send_password_reset_email(to: str, code: str) -> bool:
+    subject = "Your RawFeed password reset code"
+    body = (
+        "RawFeed\n\n"
+        "Password reset code\n\n"
+        f"Your RawFeed password reset code is:\n\n{code}\n\n"
+        f"This code expires in {settings.OTP_EXPIRE_MINUTES} minutes.\n\n"
+        "If you did not request this, you can safely ignore this message."
+    )
+    return send_email(to, subject, body)
+
+
+def send_account_deletion_email(to: str, code: str) -> bool:
+    subject = "Confirm RawFeed account deletion"
+    body = (
+        "RawFeed\n\n"
+        "Account deletion confirmation\n\n"
+        f"Your RawFeed account deletion code is:\n\n{code}\n\n"
+        f"This code expires in {settings.OTP_EXPIRE_MINUTES} minutes.\n\n"
+        "This action is permanent and cannot be undone. If you did not request this, "
+        "change your password immediately."
+    )
+    return send_email(to, subject, body)
