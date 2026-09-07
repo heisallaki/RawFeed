@@ -33,17 +33,9 @@ RawFeed/
 └── docs/
 ```
 
-## Local Setup
-
-See the setup guides in the project documentation for the required Python, Node.js, PostgreSQL, Redis, Ollama, and Expo setup.
-
 ## Environment Variables
 
 Copy `backend/.env.example` to `backend/.env` and `web/.env.example` to `web/.env` before running the apps.
-
-**Never commit `.env` files.**
-
-By default, `EMAIL_PROVIDER=console` prints OTP codes to the backend terminal instead of sending real emails. Switch to `resend` only when email delivery and domain verification have been properly configured.
 
 ## Running
 
