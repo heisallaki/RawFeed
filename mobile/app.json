@@ -6,12 +6,22 @@
     "version": "0.1.0",
     "orientation": "portrait",
     "userInterfaceStyle": "automatic",
+    "icon": "./assets/icon.png",
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#264981"
+    },
     "ios": {
       "bundleIdentifier": "com.heisallaki.rawfeed",
       "supportsTablet": true
     },
     "android": {
-      "package": "com.heisallaki.rawfeed"
+      "package": "com.heisallaki.rawfeed",
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/adaptive-icon.png",
+        "backgroundColor": "#264981"
+      }
     }
   }
 }
