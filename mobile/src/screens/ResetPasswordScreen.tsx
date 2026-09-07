@@ -1,29 +1,33 @@
 import { useState } from "react";
 import { StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { useTheme } from "../theme/ThemeContext";
 import { ACCENT_COLORS } from "../theme/theme";
-import { useAuth } from "../auth/AuthContext";
+import { resetPassword } from "../auth/authApi";
 
-export function LoginScreen() {
+export function ResetPasswordScreen() {
   const navigation = useNavigation<any>();
-  const { login } = useAuth();
+  const route = useRoute<any>();
   const { palette, accentColor } = useTheme();
   const accent = ACCENT_COLORS[accentColor];
 
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState(route.params?.email || "");
+  const [code, setCode] = useState("");
+  const [newPassword, setNewPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
+  const [message, setMessage] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
 
   const handleSubmit = async () => {
     setError(null);
+    setMessage(null);
     setSubmitting(true);
     try {
-      await login(email, password);
-      navigation.navigate("Home");
+      const result = await resetPassword(email, code, newPassword);
+      setMessage(result.message);
+      setTimeout(() => navigation.navigate("Login"), 1200);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Could not log in.");
+      setError(err instanceof Error ? err.message : "Could not reset password.");
     } finally {
       setSubmitting(false);
     }
@@ -31,8 +35,9 @@ export function LoginScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: palette.background }]}>
-      <Text style={[styles.heading, { color: palette.text }]}>Log in</Text>
+      <Text style={[styles.heading, { color: palette.text }]}>Reset password</Text>
       {error ? <Text style={{ color: "#ef4444", marginBottom: 12 }}>{error}</Text> : null}
+      {message ? <Text style={{ color: palette.textMuted, marginBottom: 12 }}>{message}</Text> : null}
       <TextInput
         placeholder="Email"
         placeholderTextColor={palette.textMuted}
@@ -43,25 +48,24 @@ export function LoginScreen() {
         style={[styles.input, { color: palette.text, borderColor: palette.textMuted }]}
       />
       <TextInput
-        placeholder="Password"
+        placeholder="Reset code"
         placeholderTextColor={palette.textMuted}
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
+        keyboardType="number-pad"
+        maxLength={6}
+        value={code}
+        onChangeText={setCode}
         style={[styles.input, { color: palette.text, borderColor: palette.textMuted }]}
       />
-      <TouchableOpacity onPress={() => navigation.navigate("ForgotPassword")} style={{ marginBottom: 12 }}>
-        <Text style={{ color: accent, fontSize: 13 }}>Forgot password?</Text>
-      </TouchableOpacity>
-      <TouchableOpacity
-        onPress={handleSubmit}
-        disabled={submitting}
-        style={[styles.button, { backgroundColor: accent }]}
-      >
-        <Text style={styles.buttonText}>{submitting ? "Logging in..." : "Log in"}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("Register")} style={{ marginTop: 16 }}>
-        <Text style={{ color: accent }}>No account? Sign up</Text>
+      <TextInput
+        placeholder="New password"
+        placeholderTextColor={palette.textMuted}
+        secureTextEntry
+        value={newPassword}
+        onChangeText={setNewPassword}
+        style={[styles.input, { color: palette.text, borderColor: palette.textMuted }]}
+      />
+      <TouchableOpacity onPress={handleSubmit} disabled={submitting} style={[styles.button, { backgroundColor: accent }]}>
+        <Text style={styles.buttonText}>{submitting ? "Resetting..." : "Reset password"}</Text>
       </TouchableOpacity>
     </View>
   );
@@ -69,7 +73,7 @@ export function LoginScreen() {
 
 const styles = StyleSheet.create({
   container: { flex: 1, padding: 24, justifyContent: "center" },
-  heading: { fontSize: 22, fontWeight: "700", marginBottom: 20 },
+  heading: { fontSize: 22, fontWeight: "700", marginBottom: 8 },
   input: { borderWidth: 1, borderRadius: 10, padding: 12, marginBottom: 12 },
   button: { paddingVertical: 12, borderRadius: 10, alignItems: "center", marginTop: 8 },
   buttonText: { color: "#ffffff", fontWeight: "700" },

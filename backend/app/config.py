@@ -19,6 +19,11 @@ class Settings(BaseSettings):
     EMAIL_PROVIDER: str = "console"
     RESEND_API_KEY: str = ""
     EMAIL_FROM: str = "RawFeed <onboarding@resend.dev>"
+    SMTP_HOST: str = ""
+    SMTP_PORT: int = 587
+    SMTP_USERNAME: str = ""
+    SMTP_PASSWORD: str = ""
+    SMTP_FROM_EMAIL: str = ""
     OTP_EXPIRE_MINUTES: int = 10
     OTP_RESEND_COOLDOWN_SECONDS: int = 60
     OTP_MAX_ATTEMPTS: int = 5

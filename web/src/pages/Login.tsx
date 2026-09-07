@@ -43,7 +43,7 @@ export function Login() {
             style={{ width: "100%", padding: "0.5rem", borderRadius: "8px" }}
           />
         </label>
-        <label style={{ display: "block", marginBottom: "1rem" }}>
+        <label style={{ display: "block", marginBottom: "0.5rem" }}>
           <span style={{ display: "block", marginBottom: "0.25rem" }}>Password</span>
           <input
             type="password"
@@ -53,6 +53,11 @@ export function Login() {
             style={{ width: "100%", padding: "0.5rem", borderRadius: "8px" }}
           />
         </label>
+        <p style={{ marginTop: 0, marginBottom: "1rem" }}>
+          <Link to="/forgot-password" className="accent-text" style={{ fontSize: "0.85rem" }}>
+            Forgot password?
+          </Link>
+        </p>
         <button type="submit" disabled={submitting} className="accent-bg" style={{ padding: "0.6rem 1.2rem", borderRadius: "8px", border: "none", color: "#fff" }}>
           {submitting ? "Logging in..." : "Log in"}
         </button>

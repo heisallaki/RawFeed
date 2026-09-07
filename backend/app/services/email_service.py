@@ -1,3 +1,6 @@
+import smtplib
+from email.mime.text import MIMEText
+
 import httpx
 
 from app.config import get_settings
@@ -6,6 +9,8 @@ settings = get_settings()
 
 
 def send_email(to: str, subject: str, body: str) -> bool:
+    if settings.EMAIL_PROVIDER == "smtp":
+        return _send_via_smtp(to, subject, body)
     if settings.EMAIL_PROVIDER == "resend":
         return _send_via_resend(to, subject, body)
     return _send_via_console(to, subject, body)
@@ -34,6 +39,27 @@ def _send_via_resend(to: str, subject: str, body: str) -> bool:
         return True
     except Exception:
         return False
+
+
+def _send_via_smtp(to: str, subject: str, body: str) -> bool:
+    if not settings.SMTP_HOST or not settings.SMTP_USERNAME or not settings.SMTP_PASSWORD:
+        print("SMTP is selected but not fully configured. Falling back to console output.")
+        return _send_via_console(to, subject, body)
+
+    message = MIMEText(body, "plain")
+    message["Subject"] = subject
+    message["From"] = settings.SMTP_FROM_EMAIL or settings.SMTP_USERNAME
+    message["To"] = to
+
+    try:
+        with smtplib.SMTP(settings.SMTP_HOST, settings.SMTP_PORT, timeout=10) as server:
+            server.starttls()
+            server.login(settings.SMTP_USERNAME, settings.SMTP_PASSWORD)
+            server.sendmail(message["From"], [to], message.as_string())
+        return True
+    except Exception as error:
+        print(f"SMTP send failed (not a credential leak: {type(error).__name__}). Falling back to console output.")
+        return _send_via_console(to, subject, body)
 
 
 def send_verification_email(to: str, code: str) -> bool:
