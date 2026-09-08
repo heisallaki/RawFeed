@@ -1,4 +1,6 @@
-const API_URL = (import.meta as ImportMeta & { env: { VITE_API_URL?: string } }).env.VITE_API_URL as string;
+const API_URL = (import.meta as ImportMeta & {
+  env: { VITE_API_URL?: string };
+}).env.VITE_API_URL as string;
 
 export interface AuthUser {
   id: string;
@@ -17,10 +19,31 @@ export interface TokenPair {
 
 export type AuthFetch = (path: string, options?: RequestInit) => Promise<Response>;
 
+export interface ApiErrorLike extends Error {
+  code?: string;
+}
+
+function extractMessageAndCode(detail: unknown): { message: string; code?: string } {
+  if (typeof detail === "string" && detail.trim().length > 0) {
+    return { message: detail };
+  }
+  if (detail && typeof detail === "object" && !Array.isArray(detail)) {
+    const obj = detail as Record<string, unknown>;
+    const message = typeof obj.message === "string" ? obj.message : JSON.stringify(obj);
+    const code = typeof obj.code === "string" ? obj.code : undefined;
+    return { message, code };
+  }
+  return { message: "Request failed" };
+}
+
 async function handle<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const body = await response.json().catch(() => ({ detail: "Request failed" }));
-    throw new Error(body.detail || "Request failed");
+    const { message, code } = extractMessageAndCode(body?.detail);
+    const error: ApiErrorLike = new Error(message);
+    if (code) error.code = code;
+    console.error("RawFeed API error:", { status: response.status, message, code });
+    throw error;
   }
   return response.json() as Promise<T>;
 }
@@ -90,6 +113,14 @@ export function resetPassword(email: string, code: string, newPassword: string):
   }).then((res) => handle<{ message: string }>(res));
 }
 
+export function requestReactivation(email: string): Promise<{ message: string }> {
+  return fetch(`${API_URL}/api/auth/request-reactivation`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
+  }).then((res) => handle<{ message: string }>(res));
+}
+
 export function requestAccountDeletion(authFetch: AuthFetch): Promise<{ message: string }> {
   return authFetch("/api/users/me/request-deletion", { method: "POST" }).then((res) =>
     handle<{ message: string }>(res)
@@ -105,12 +136,12 @@ export function confirmAccountDeletion(authFetch: AuthFetch, code: string): Prom
 }
 
 export interface AdminUser {
-  reactivation_requested: boolean;
   id: string;
   email: string;
   is_active: boolean;
   is_verified: boolean;
   is_admin: boolean;
+  reactivation_requested: boolean;
   created_at: string;
 }
 

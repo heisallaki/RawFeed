@@ -4,7 +4,7 @@ import { useNavigation } from "@react-navigation/native";
 import { useTheme } from "../theme/ThemeContext";
 import { ACCENT_COLORS } from "../theme/theme";
 import { useAuth } from "../auth/AuthContext";
-import { ApiError, requestReactivation } from "../auth/authApi";
+import { ApiErrorLike, requestReactivation } from "../auth/authApi";
 
 export function LoginScreen() {
   const navigation = useNavigation<any>();
@@ -29,11 +29,11 @@ export function LoginScreen() {
       await login(email, password);
       navigation.navigate("Home");
     } catch (err) {
-      if (err instanceof ApiError && err.code === "account_deactivated") {
+      const apiError = err as ApiErrorLike;
+      const message = apiError?.message || "Could not log in.";
+      setError(message);
+      if (apiError?.code === "account_deactivated") {
         setDeactivated(true);
-        setError(err.message);
-      } else {
-        setError(err instanceof Error ? err.message : "Could not log in.");
       }
     } finally {
       setSubmitting(false);

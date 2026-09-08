@@ -1,10 +1,10 @@
-const env = (globalThis as {
-  process?: {
-    env?: Record<string, string | undefined>;
+declare const process: {
+  env: {
+    EXPO_PUBLIC_API_URL?: string;
   };
-}).process?.env;
+};
 
-const API_URL = env?.EXPO_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:8000";
 
 export interface AuthUser {
   id: string;
@@ -21,23 +21,31 @@ export interface TokenPair {
   token_type: string;
 }
 
-export class ApiError extends Error {
+export interface ApiErrorLike extends Error {
   code?: string;
+}
 
-  constructor(message: string, code?: string) {
-    super(message);
-    this.code = code;
+function extractMessageAndCode(detail: unknown): { message: string; code?: string } {
+  if (typeof detail === "string" && detail.trim().length > 0) {
+    return { message: detail };
   }
+  if (detail && typeof detail === "object" && !Array.isArray(detail)) {
+    const obj = detail as Record<string, unknown>;
+    const message = typeof obj.message === "string" ? obj.message : JSON.stringify(obj);
+    const code = typeof obj.code === "string" ? obj.code : undefined;
+    return { message, code };
+  }
+  return { message: "Request failed" };
 }
 
 async function handle<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const body = await response.json().catch(() => ({ detail: "Request failed" }));
-    const detail = body.detail;
-    if (detail && typeof detail === "object") {
-      throw new ApiError(detail.message || "Request failed", detail.code);
-    }
-    throw new ApiError(detail || "Request failed");
+    const { message, code } = extractMessageAndCode(body?.detail);
+    const error: ApiErrorLike = new Error(message);
+    if (code) error.code = code;
+    console.error("RawFeed API error:", { status: response.status, message, code });
+    throw error;
   }
   return response.json() as Promise<T>;
 }

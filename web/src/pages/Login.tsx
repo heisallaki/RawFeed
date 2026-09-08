@@ -1,14 +1,7 @@
 import { FormEvent, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
-
-async function requestReactivation(email: string): Promise<{ message: string }> {
-  if (!email.trim()) {
-    throw new Error("Email is required.");
-  }
-
-  return { message: "A reactivation request has been sent." };
-}
+import { ApiErrorLike, requestReactivation } from "../lib/authApi";
 
 export function Login() {
   const { login } = useAuth();
@@ -30,16 +23,12 @@ export function Login() {
     try {
       await login(email, password);
       navigate("/");
-    } catch (err: unknown) {
-      const apiError = err as { code?: string; message?: string } | null;
-
-      if (apiError && typeof apiError === "object" && "code" in apiError && apiError.code === "account_deactivated") {
+    } catch (err) {
+      const apiError = err as ApiErrorLike;
+      const message = apiError?.message || "Could not log in.";
+      setError(message);
+      if (apiError?.code === "account_deactivated") {
         setDeactivated(true);
-        setError(apiError.message || "Your account has been deactivated.");
-      } else if (err instanceof Error) {
-        setError(err.message);
-      } else {
-        setError("Could not log in.");
       }
     } finally {
       setSubmitting(false);
