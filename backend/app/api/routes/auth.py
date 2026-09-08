@@ -19,6 +19,7 @@ from app.schemas.auth import (
     MessageResponse,
     PasswordResetConfirm,
     PasswordResetRequest,
+    ReactivationRequest,
     RefreshRequest,
     ResendVerificationRequest,
     Token,
@@ -105,6 +106,20 @@ def reset_password(payload: PasswordResetConfirm, db: Session = Depends(get_db))
     return MessageResponse(message="Password has been reset. You can now log in with your new password.")
 
 
+@router.post("/request-reactivation", response_model=MessageResponse)
+def request_reactivation(payload: ReactivationRequest, db: Session = Depends(get_db)):
+    user = db.query(User).filter(User.email == payload.email).first()
+    if user is not None and not user.is_active:
+        rate_limit_key = f"reactivation:{payload.email}"
+        if check_and_increment(rate_limit_key, max_calls=1, window_seconds=settings.OTP_RESEND_COOLDOWN_SECONDS):
+            user.reactivation_requested = True
+            db.commit()
+
+    return MessageResponse(
+        message="If that account exists and is deactivated, an administrator will review your request."
+    )
+
+
 @router.post("/login", response_model=Token)
 def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depends(get_db)):
     user = db.query(User).filter(User.email == form_data.username).first()
@@ -115,7 +130,13 @@ def login(form_data: OAuth2PasswordRequestForm = Depends(), db: Session = Depend
             headers={"WWW-Authenticate": "Bearer"},
         )
     if not user.is_active:
-        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account is disabled")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail={
+                "code": "account_deactivated",
+                "message": "Your account has been deactivated by an administrator.",
+            },
+        )
 
     return Token(
         access_token=create_access_token(str(user.id)),

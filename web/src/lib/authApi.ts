@@ -105,6 +105,7 @@ export function confirmAccountDeletion(authFetch: AuthFetch, code: string): Prom
 }
 
 export interface AdminUser {
+  reactivation_requested: boolean;
   id: string;
   email: string;
   is_active: boolean;

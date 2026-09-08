@@ -72,7 +72,7 @@ export function Home() {
         </div>
       ) : (
         <>
-          <FeedSection title="Breaking" icon="🔥" events={events.filter((event) => event.importance_score >= 85)} />
+          <FeedSection title="Breaking" icon="🚨" events={events.filter((event) => event.importance_score >= 85)} />
           <FeedSection
             title="Developing"
             icon="📡"

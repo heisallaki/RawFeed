@@ -1,6 +1,10 @@
-const API_URL =
-  (globalThis as { process?: { env?: { EXPO_PUBLIC_API_URL?: string } } }).process?.env
-    ?.EXPO_PUBLIC_API_URL || "http://localhost:8000";
+const env = (globalThis as {
+  process?: {
+    env?: Record<string, string | undefined>;
+  };
+}).process?.env;
+
+const API_URL = env?.EXPO_PUBLIC_API_URL || "http://localhost:8000";
 
 export interface AuthUser {
   id: string;
@@ -17,10 +21,23 @@ export interface TokenPair {
   token_type: string;
 }
 
+export class ApiError extends Error {
+  code?: string;
+
+  constructor(message: string, code?: string) {
+    super(message);
+    this.code = code;
+  }
+}
+
 async function handle<T>(response: Response): Promise<T> {
   if (!response.ok) {
     const body = await response.json().catch(() => ({ detail: "Request failed" }));
-    throw new Error(body.detail || "Request failed");
+    const detail = body.detail;
+    if (detail && typeof detail === "object") {
+      throw new ApiError(detail.message || "Request failed", detail.code);
+    }
+    throw new ApiError(detail || "Request failed");
   }
   return response.json() as Promise<T>;
 }
@@ -87,5 +104,13 @@ export function resetPassword(email: string, code: string, newPassword: string):
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, code, new_password: newPassword }),
+  }).then((res) => handle<{ message: string }>(res));
+}
+
+export function requestReactivation(email: string): Promise<{ message: string }> {
+  return fetch(`${API_URL}/api/auth/request-reactivation`, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ email }),
   }).then((res) => handle<{ message: string }>(res));
 }

@@ -98,6 +98,9 @@ export function Admin() {
               >
                 {u.is_active ? "Active" : "Deactivated"}
               </span>
+              {!u.is_active && u.reactivation_requested && (
+                <span className="badge-pending">Reactivation requested</span>
+              )}
               {u.is_admin && (
                 <span
                   style={{

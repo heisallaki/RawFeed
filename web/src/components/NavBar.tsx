@@ -41,9 +41,7 @@ export function NavBar() {
         flexWrap: "wrap",
       }}
     >
-      <span className="accent-text" style={{ fontWeight: 700, fontSize: "1.1rem" }}>
-        RawFeed
-      </span>
+      <span className="brand-title">RawFeed</span>
 
       <div style={{ display: "flex", flex: "1 1 auto", justifyContent: "space-evenly", flexWrap: "wrap" }}>
         {LINKS.map((link) => (

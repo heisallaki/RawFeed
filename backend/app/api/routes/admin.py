@@ -13,7 +13,7 @@ router = APIRouter(prefix="/api/admin", tags=["admin"])
 
 @router.get("/users", response_model=list[AdminUserRead])
 def list_users(current_admin: User = Depends(get_current_admin_user), db: Session = Depends(get_db)):
-    return db.query(User).order_by(User.created_at.desc()).all()
+    return db.query(User).order_by(User.reactivation_requested.desc(), User.created_at.desc()).all()
 
 
 @router.post("/users/{user_id}/deactivate", response_model=AdminUserRead)
@@ -45,6 +45,7 @@ def activate_user(
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
 
     target.is_active = True
+    target.reactivation_requested = False
     db.commit()
     db.refresh(target)
     return target
