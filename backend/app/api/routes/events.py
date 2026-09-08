@@ -1,4 +1,5 @@
 import uuid
+from datetime import datetime, timedelta, timezone
 
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
@@ -17,6 +18,7 @@ def list_events(
     category: str | None = Query(default=None),
     county: str | None = Query(default=None),
     status: str | None = Query(default=None),
+    max_age_hours: int = Query(default=168, ge=0, le=8760),
     limit: int = Query(default=50, le=200),
     db: Session = Depends(get_db),
 ):
@@ -27,6 +29,10 @@ def list_events(
         query = query.filter(Event.county == county)
     if status:
         query = query.filter(Event.status == status)
+    if max_age_hours > 0:
+        cutoff = datetime.now(timezone.utc) - timedelta(hours=max_age_hours)
+        query = query.filter(Event.last_updated_at >= cutoff)
+
     return query.order_by(Event.importance_score.desc(), Event.last_updated_at.desc()).limit(limit).all()
 
 

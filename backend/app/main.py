@@ -1,3 +1,5 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -10,14 +12,24 @@ from app.api.routes.sources import router as sources_router
 from app.api.routes.users import router as users_router
 from app.config import get_settings
 from app.core.errors import unhandled_exception_handler
+from app.scheduler import start_scheduler, stop_scheduler
 
 settings = get_settings()
 
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    start_scheduler()
+    yield
+    stop_scheduler()
+
+
 app = FastAPI(
     title="RawFeed API",
-    version="1.1.0",
+    version="1.2.0",
     docs_url="/docs" if settings.ENVIRONMENT != "production" else None,
     redoc_url="/redoc" if settings.ENVIRONMENT != "production" else None,
+    lifespan=lifespan,
 )
 
 app.add_middleware(
@@ -41,7 +53,7 @@ app.include_router(admin_router)
 
 @app.get("/")
 def read_root():
-    return {"name": "RawFeed API", "status": "ok", "version": "1.1.0"}
+    return {"name": "RawFeed API", "status": "ok", "version": "1.2.0"}
 
 
 @app.get("/health")
