@@ -1,16 +1,4 @@
-const CATEGORIES: { value: string; label: string }[] = [
-  { value: "government_politics", label: "Government & Politics" },
-  { value: "economy_business", label: "Economy & Business" },
-  { value: "technology_ai", label: "Technology & AI" },
-  { value: "science", label: "Science" },
-  { value: "health", label: "Health" },
-  { value: "security", label: "Security" },
-  { value: "climate_weather", label: "Climate & Weather" },
-  { value: "transportation", label: "Transportation" },
-  { value: "emergencies_disasters", label: "Emergencies & Disasters" },
-  { value: "public_figures", label: "Public Figures" },
-  { value: "other", label: "Other" },
-];
+import { CATEGORIES } from "../constants/categories";
 
 interface CategoryFilterProps {
   selected: string | null;
@@ -39,7 +27,7 @@ export function CategoryFilter({ selected, onSelect }: CategoryFilterProps) {
             border: selected === category.value ? "2px solid var(--accent-color)" : "none",
           }}
         >
-          {category.label}
+          {category.icon} {category.label}
         </button>
       ))}
     </div>

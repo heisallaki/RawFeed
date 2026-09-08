@@ -31,6 +31,8 @@ export function NavBar() {
     <nav
       className="glass-panel"
       style={{
+        position: "relative",
+        zIndex: 100,
         display: "flex",
         alignItems: "center",
         gap: "1rem",
@@ -49,6 +51,11 @@ export function NavBar() {
             {link.label}
           </NavLink>
         ))}
+        {user?.is_admin && (
+          <NavLink to="/admin" className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}>
+            Admin
+          </NavLink>
+        )}
       </div>
 
       {!loading &&

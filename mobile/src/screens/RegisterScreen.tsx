@@ -7,7 +7,7 @@ import { useAuth } from "../auth/AuthContext";
 
 export function RegisterScreen() {
   const navigation = useNavigation<any>();
-  const { register } = useAuth();
+  const { register, login } = useAuth();
   const { palette, accentColor } = useTheme();
   const accent = ACCENT_COLORS[accentColor];
 
@@ -26,6 +26,7 @@ export function RegisterScreen() {
     setSubmitting(true);
     try {
       await register(email, password);
+      await login(email, password);
       navigation.navigate("VerifyEmail", { email });
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not create account.");
@@ -78,30 +79,9 @@ export function RegisterScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    padding: 24,
-    justifyContent: "center",
-  },
-  heading: {
-    fontSize: 22,
-    fontWeight: "700",
-    marginBottom: 20,
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 10,
-    padding: 12,
-    marginBottom: 12,
-  },
-  button: {
-    paddingVertical: 12,
-    borderRadius: 10,
-    alignItems: "center",
-    marginTop: 8,
-  },
-  buttonText: {
-    color: "#ffffff",
-    fontWeight: "700",
-  },
+  container: { flex: 1, padding: 24, justifyContent: "center" },
+  heading: { fontSize: 22, fontWeight: "700", marginBottom: 20 },
+  input: { borderWidth: 1, borderRadius: 10, padding: 12, marginBottom: 12 },
+  button: { paddingVertical: 12, borderRadius: 10, alignItems: "center", marginTop: 8 },
+  buttonText: { color: "#ffffff", fontWeight: "700" },
 });

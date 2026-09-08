@@ -1,10 +1,11 @@
-const API_URL = (import.meta as ImportMeta & { env: Record<string, string> }).env.VITE_API_URL;
+const API_URL = (import.meta as ImportMeta & { env: { VITE_API_URL?: string } }).env.VITE_API_URL as string;
 
 export interface AuthUser {
   id: string;
   email: string;
   is_active: boolean;
   is_verified: boolean;
+  is_admin: boolean;
   created_at: string;
 }
 
@@ -101,4 +102,27 @@ export function confirmAccountDeletion(authFetch: AuthFetch, code: string): Prom
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ code }),
   }).then((res) => handle<{ message: string }>(res));
+}
+
+export interface AdminUser {
+  id: string;
+  email: string;
+  is_active: boolean;
+  is_verified: boolean;
+  is_admin: boolean;
+  created_at: string;
+}
+
+export function fetchAdminUsers(authFetch: AuthFetch): Promise<AdminUser[]> {
+  return authFetch("/api/admin/users").then((res) => handle<AdminUser[]>(res));
+}
+
+export function deactivateUser(authFetch: AuthFetch, userId: string): Promise<AdminUser> {
+  return authFetch(`/api/admin/users/${userId}/deactivate`, { method: "POST" }).then((res) =>
+    handle<AdminUser>(res)
+  );
+}
+
+export function activateUser(authFetch: AuthFetch, userId: string): Promise<AdminUser> {
+  return authFetch(`/api/admin/users/${userId}/activate`, { method: "POST" }).then((res) => handle<AdminUser>(res));
 }

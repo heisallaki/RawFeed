@@ -1,10 +1,12 @@
 import { FormEvent, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { resendVerification, verifyEmail } from "../lib/authApi";
+import { useAuth } from "../auth/AuthContext";
 
 export function VerifyEmail() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { setUser } = useAuth();
   const [email, setEmail] = useState(searchParams.get("email") || "");
   const [code, setCode] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -17,8 +19,9 @@ export function VerifyEmail() {
     setMessage(null);
     setSubmitting(true);
     try {
-      await verifyEmail(email, code);
-      navigate("/login");
+      const updatedUser = await verifyEmail(email, code);
+      setUser(updatedUser);
+      navigate("/");
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not verify email.");
     } finally {
@@ -41,7 +44,7 @@ export function VerifyEmail() {
     <div className="glass-panel" style={{ margin: "1rem", padding: "1.5rem", maxWidth: "420px" }}>
       <h2 className="accent-text">Verify your email</h2>
       <p style={{ color: "var(--color-text-muted)" }}>
-        Enter the 6-digit code we sent to your email. It expires in 10 minutes.
+        You're logged in already — just enter the 6-digit code we sent to your email. It expires in 10 minutes.
       </p>
       {error && (
         <p role="alert" style={{ color: "#ef4444" }}>

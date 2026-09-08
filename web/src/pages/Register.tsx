@@ -3,7 +3,7 @@ import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../auth/AuthContext";
 
 export function Register() {
-  const { register } = useAuth();
+  const { register, login } = useAuth();
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -21,6 +21,7 @@ export function Register() {
     setSubmitting(true);
     try {
       await register(email, password);
+      await login(email, password);
       navigate(`/verify-email?email=${encodeURIComponent(email)}`);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Could not create account.");

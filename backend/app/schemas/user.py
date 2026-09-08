@@ -16,6 +16,18 @@ class UserRead(BaseModel):
     email: EmailStr
     is_active: bool
     is_verified: bool
+    is_admin: bool
+    created_at: datetime
+
+
+class AdminUserRead(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: uuid.UUID
+    email: EmailStr
+    is_active: bool
+    is_verified: bool
+    is_admin: bool
     created_at: datetime
 
 

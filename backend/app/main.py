@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.api.routes.admin import router as admin_router
 from app.api.routes.auth import router as auth_router
 from app.api.routes.events import router as events_router
 from app.api.routes.ingestion import router as ingestion_router
@@ -14,7 +15,7 @@ settings = get_settings()
 
 app = FastAPI(
     title="RawFeed API",
-    version="1.0.0",
+    version="1.1.0",
     docs_url="/docs" if settings.ENVIRONMENT != "production" else None,
     redoc_url="/redoc" if settings.ENVIRONMENT != "production" else None,
 )
@@ -35,11 +36,12 @@ app.include_router(events_router)
 app.include_router(sources_router)
 app.include_router(ingestion_router)
 app.include_router(notifications_router)
+app.include_router(admin_router)
 
 
 @app.get("/")
 def read_root():
-    return {"name": "RawFeed API", "status": "ok", "version": "1.0.0"}
+    return {"name": "RawFeed API", "status": "ok", "version": "1.1.0"}
 
 
 @app.get("/health")

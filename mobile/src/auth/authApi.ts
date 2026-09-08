@@ -1,10 +1,13 @@
-const API_URL = process.env.EXPO_PUBLIC_API_URL || "http://localhost:8000";
+const API_URL =
+  (globalThis as { process?: { env?: { EXPO_PUBLIC_API_URL?: string } } }).process?.env
+    ?.EXPO_PUBLIC_API_URL || "http://localhost:8000";
 
 export interface AuthUser {
   id: string;
   email: string;
   is_active: boolean;
   is_verified: boolean;
+  is_admin: boolean;
   created_at: string;
 }
 
@@ -84,20 +87,5 @@ export function resetPassword(email: string, code: string, newPassword: string):
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email, code, new_password: newPassword }),
-  }).then((res) => handle<{ message: string }>(res));
-}
-
-export function requestAccountDeletion(accessToken: string): Promise<{ message: string }> {
-  return fetch(`${API_URL}/api/users/me/request-deletion`, {
-    method: "POST",
-    headers: { Authorization: `Bearer ${accessToken}` },
-  }).then((res) => handle<{ message: string }>(res));
-}
-
-export function confirmAccountDeletion(accessToken: string, code: string): Promise<{ message: string }> {
-  return fetch(`${API_URL}/api/users/me/confirm-deletion`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
-    body: JSON.stringify({ code }),
   }).then((res) => handle<{ message: string }>(res));
 }

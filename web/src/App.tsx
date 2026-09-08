@@ -14,6 +14,7 @@ import { Register } from "./pages/Register";
 import { VerifyEmail } from "./pages/VerifyEmail";
 import { ForgotPassword } from "./pages/ForgotPassword";
 import { ResetPassword } from "./pages/ResetPassword";
+import { Admin } from "./pages/Admin";
 
 export default function App() {
   return (
@@ -35,6 +36,7 @@ export default function App() {
                   <Route path="/verify-email" element={<VerifyEmail />} />
                   <Route path="/forgot-password" element={<ForgotPassword />} />
                   <Route path="/reset-password" element={<ResetPassword />} />
+                  <Route path="/admin" element={<Admin />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </div>
