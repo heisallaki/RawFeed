@@ -1,4 +1,4 @@
-# RawFeed
+![RawFeed preview](docs/preview.png)
 
 **Know what matters. Ignore the noise.**
 
@@ -72,3 +72,6 @@ cd backend
 source .venv/bin/activate
 python -m pytest -v
 ```
+## Project Status
+
+Live in production.
