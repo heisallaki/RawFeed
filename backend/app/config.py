@@ -30,6 +30,7 @@ class Settings(BaseSettings):
     ENABLE_SCHEDULER: bool = True
     INGESTION_INTERVAL_MINUTES: int = 15
     ENRICHMENT_INTERVAL_MINUTES: int = 20
+    INGESTION_API_KEY: str = ""
 
     @property
     def cors_origins_list(self) -> list[str]:
