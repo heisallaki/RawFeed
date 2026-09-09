@@ -1,4 +1,5 @@
 ![RawFeed preview](docs/preview.png)
+## RawFeed
 
 **Know what matters. Ignore the noise.**
 
@@ -75,3 +76,6 @@ python -m pytest -v
 ## Project Status
 
 Live in production.
+
+## LICENSE
+MIT
