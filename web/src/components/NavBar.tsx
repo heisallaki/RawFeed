@@ -29,7 +29,7 @@ export function NavBar() {
 
   return (
     <nav
-      className="glass-panel"
+      className="glass-panel navbar"
       style={{
         position: "relative",
         zIndex: 100,
@@ -41,9 +41,9 @@ export function NavBar() {
         flexWrap: "wrap",
       }}
     >
-      <span className="brand-title">RawFeed</span>
+      <span className="brand-title navbar-brand">RawFeed</span>
 
-      <div style={{ display: "flex", flex: "1 1 auto", justifyContent: "space-evenly", flexWrap: "wrap" }}>
+      <div className="navbar-links" style={{ display: "flex", flex: "1 1 auto", minWidth: 0, justifyContent: "space-evenly", flexWrap: "wrap" }}>
         {LINKS.map((link) => (
           <NavLink key={link.to} to={link.to} className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}>
             {link.label}
@@ -58,7 +58,7 @@ export function NavBar() {
 
       {!loading &&
         (user ? (
-          <div ref={menuRef} style={{ position: "relative" }}>
+          <div ref={menuRef} className="navbar-auth" style={{ position: "relative", flexShrink: 0 }}>
             <button
               onClick={() => setMenuOpen((open) => !open)}
               className="nav-avatar"
@@ -102,7 +102,7 @@ export function NavBar() {
             )}
           </div>
         ) : (
-          <div style={{ display: "flex", gap: "0.5rem" }}>
+          <div className="navbar-auth" style={{ display: "flex", gap: "0.5rem", flexShrink: 0 }}>
             <NavLink to="/login" className="nav-link">
               Log in
             </NavLink>

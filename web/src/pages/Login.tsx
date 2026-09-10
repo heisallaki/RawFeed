@@ -46,66 +46,68 @@ export function Login() {
   };
 
   return (
-    <div className="glass-panel" style={{ margin: "1rem", padding: "1.5rem", maxWidth: "420px" }}>
-      <h2 className="accent-text">Log in</h2>
-      {error && (
-        <p role="alert" style={{ color: "#ef4444" }}>
-          {error}
+    <div style={{ flex: "1 1 auto", display: "flex", alignItems: "center", justifyContent: "center", width: "100%", padding: "1rem" }}>
+      <div className="glass-panel" style={{ padding: "1.5rem", maxWidth: "420px", width: "100%" }}>
+        <h2 className="accent-text">Log in</h2>
+        {error && (
+          <p role="alert" style={{ color: "#ef4444" }}>
+            {error}
+          </p>
+        )}
+        {deactivated && (
+          <div className="reactivation-box">
+            {reactivationMessage ? (
+              <p style={{ margin: 0, color: "var(--color-text-muted)" }}>{reactivationMessage}</p>
+            ) : (
+              <>
+                <p style={{ margin: "0 0 0.6rem 0", color: "var(--color-text-muted)" }}>
+                  If you believe this was a mistake, you can ask an administrator to review it.
+                </p>
+                <button
+                  onClick={handleRequestReactivation}
+                  disabled={requesting}
+                  style={{ padding: "0.5rem 1rem", borderRadius: "8px", border: "1px solid #ef4444", color: "#ef4444", background: "none" }}
+                >
+                  {requesting ? "Sending request..." : "Request reactivation"}
+                </button>
+              </>
+            )}
+          </div>
+        )}
+        <form onSubmit={handleSubmit}>
+          <label style={{ display: "block", marginBottom: "0.75rem", marginTop: "1rem" }}>
+            <span style={{ display: "block", marginBottom: "0.25rem" }}>Email</span>
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              style={{ width: "100%", padding: "0.5rem", borderRadius: "8px" }}
+            />
+          </label>
+          <label style={{ display: "block", marginBottom: "0.5rem" }}>
+            <span style={{ display: "block", marginBottom: "0.25rem" }}>Password</span>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              style={{ width: "100%", padding: "0.5rem", borderRadius: "8px" }}
+            />
+          </label>
+          <p style={{ marginTop: 0, marginBottom: "1rem" }}>
+            <Link to="/forgot-password" className="accent-text" style={{ fontSize: "0.85rem" }}>
+              Forgot password?
+            </Link>
+          </p>
+          <button type="submit" disabled={submitting} className="accent-bg" style={{ padding: "0.6rem 1.2rem", borderRadius: "8px", border: "none", color: "#fff" }}>
+            {submitting ? "Logging in..." : "Log in"}
+          </button>
+        </form>
+        <p style={{ marginTop: "1rem" }}>
+          No account? <Link to="/register" className="accent-text">Sign up</Link>
         </p>
-      )}
-      {deactivated && (
-        <div className="reactivation-box">
-          {reactivationMessage ? (
-            <p style={{ margin: 0, color: "var(--color-text-muted)" }}>{reactivationMessage}</p>
-          ) : (
-            <>
-              <p style={{ margin: "0 0 0.6rem 0", color: "var(--color-text-muted)" }}>
-                If you believe this was a mistake, you can ask an administrator to review it.
-              </p>
-              <button
-                onClick={handleRequestReactivation}
-                disabled={requesting}
-                style={{ padding: "0.5rem 1rem", borderRadius: "8px", border: "1px solid #ef4444", color: "#ef4444", background: "none" }}
-              >
-                {requesting ? "Sending request..." : "Request reactivation"}
-              </button>
-            </>
-          )}
-        </div>
-      )}
-      <form onSubmit={handleSubmit}>
-        <label style={{ display: "block", marginBottom: "0.75rem", marginTop: "1rem" }}>
-          <span style={{ display: "block", marginBottom: "0.25rem" }}>Email</span>
-          <input
-            type="email"
-            required
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            style={{ width: "100%", padding: "0.5rem", borderRadius: "8px" }}
-          />
-        </label>
-        <label style={{ display: "block", marginBottom: "0.5rem" }}>
-          <span style={{ display: "block", marginBottom: "0.25rem" }}>Password</span>
-          <input
-            type="password"
-            required
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            style={{ width: "100%", padding: "0.5rem", borderRadius: "8px" }}
-          />
-        </label>
-        <p style={{ marginTop: 0, marginBottom: "1rem" }}>
-          <Link to="/forgot-password" className="accent-text" style={{ fontSize: "0.85rem" }}>
-            Forgot password?
-          </Link>
-        </p>
-        <button type="submit" disabled={submitting} className="accent-bg" style={{ padding: "0.6rem 1.2rem", borderRadius: "8px", border: "none", color: "#fff" }}>
-          {submitting ? "Logging in..." : "Log in"}
-        </button>
-      </form>
-      <p style={{ marginTop: "1rem" }}>
-        No account? <Link to="/register" className="accent-text">Sign up</Link>
-      </p>
+      </div>
     </div>
   );
 }

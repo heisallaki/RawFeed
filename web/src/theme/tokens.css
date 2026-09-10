@@ -177,6 +177,23 @@ button:active {
   cursor: pointer;
 }
 
+.navbar-brand {
+  flex-shrink: 0;
+}
+
+.navbar-auth {
+  flex-shrink: 0;
+}
+
+@media (max-width: 640px) {
+  .navbar-links {
+    order: 3;
+    flex-basis: 100%;
+    justify-content: flex-start;
+    gap: 0.4rem;
+  }
+}
+
 .brand-title {
   font-weight: 800;
   font-size: 1.35rem;

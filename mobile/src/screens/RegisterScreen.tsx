@@ -37,49 +37,52 @@ export function RegisterScreen() {
 
   return (
     <View style={[styles.container, { backgroundColor: palette.background }]}>
-      <Text style={[styles.heading, { color: palette.text }]}>Create your account</Text>
-      {error ? <Text style={{ color: "#ef4444", marginBottom: 12 }}>{error}</Text> : null}
-      <TextInput
-        placeholder="Email"
-        placeholderTextColor={palette.textMuted}
-        autoCapitalize="none"
-        keyboardType="email-address"
-        value={email}
-        onChangeText={setEmail}
-        style={[styles.input, { color: palette.text, borderColor: palette.textMuted }]}
-      />
-      <TextInput
-        placeholder="Password"
-        placeholderTextColor={palette.textMuted}
-        secureTextEntry
-        value={password}
-        onChangeText={setPassword}
-        style={[styles.input, { color: palette.text, borderColor: palette.textMuted }]}
-      />
-      <TextInput
-        placeholder="Confirm password"
-        placeholderTextColor={palette.textMuted}
-        secureTextEntry
-        value={confirmPassword}
-        onChangeText={setConfirmPassword}
-        style={[styles.input, { color: palette.text, borderColor: palette.textMuted }]}
-      />
-      <TouchableOpacity
-        onPress={handleSubmit}
-        disabled={submitting}
-        style={[styles.button, { backgroundColor: accent }]}
-      >
-        <Text style={styles.buttonText}>{submitting ? "Creating account..." : "Sign up"}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity onPress={() => navigation.navigate("Login")} style={{ marginTop: 16 }}>
-        <Text style={{ color: accent }}>Already have an account? Log in</Text>
-      </TouchableOpacity>
+      <View style={styles.formWrapper}>
+        <Text style={[styles.heading, { color: palette.text }]}>Create your account</Text>
+        {error ? <Text style={{ color: "#ef4444", marginBottom: 12 }}>{error}</Text> : null}
+        <TextInput
+          placeholder="Email"
+          placeholderTextColor={palette.textMuted}
+          autoCapitalize="none"
+          keyboardType="email-address"
+          value={email}
+          onChangeText={setEmail}
+          style={[styles.input, { color: palette.text, borderColor: palette.textMuted }]}
+        />
+        <TextInput
+          placeholder="Password"
+          placeholderTextColor={palette.textMuted}
+          secureTextEntry
+          value={password}
+          onChangeText={setPassword}
+          style={[styles.input, { color: palette.text, borderColor: palette.textMuted }]}
+        />
+        <TextInput
+          placeholder="Confirm password"
+          placeholderTextColor={palette.textMuted}
+          secureTextEntry
+          value={confirmPassword}
+          onChangeText={setConfirmPassword}
+          style={[styles.input, { color: palette.text, borderColor: palette.textMuted }]}
+        />
+        <TouchableOpacity
+          onPress={handleSubmit}
+          disabled={submitting}
+          style={[styles.button, { backgroundColor: accent }]}
+        >
+          <Text style={styles.buttonText}>{submitting ? "Creating account..." : "Sign up"}</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={() => navigation.navigate("Login")} style={{ marginTop: 16 }}>
+          <Text style={{ color: accent }}>Already have an account? Log in</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 24, justifyContent: "center" },
+  container: { flex: 1, padding: 24, justifyContent: "center", alignItems: "center" },
+  formWrapper: { width: "100%", maxWidth: 420, alignSelf: "center" },
   heading: { fontSize: 22, fontWeight: "700", marginBottom: 20 },
   input: { borderWidth: 1, borderRadius: 10, padding: 12, marginBottom: 12 },
   button: { paddingVertical: 12, borderRadius: 10, alignItems: "center", marginTop: 8 },
