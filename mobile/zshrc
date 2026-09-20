@@ -1,0 +1,4 @@
+export PATH="/opt/homebrew/opt/postgresql@16/bin:$PAT$
+export PATH="/usr/local/opt/postgresql@16/bin:$PATH"
+export PATH="/opt/homebrew/opt/postgresql@16/bin:$PAT$
+export PATH="/usr/local/opt/postgresql@16/bin:$PATH"

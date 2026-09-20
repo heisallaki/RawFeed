@@ -1,0 +1,67 @@
+export interface CountyInfo {
+  name: string;
+  region: string;
+  lat: number;
+  lng: number;
+}
+
+export const REGIONS = [
+  "Coast",
+  "North Eastern",
+  "Eastern",
+  "Central",
+  "Rift Valley",
+  "Western",
+  "Nyanza",
+  "Nairobi",
+];
+
+export const KENYA_COUNTIES: CountyInfo[] = [
+  { name: "Mombasa", region: "Coast", lat: -4.0435, lng: 39.6682 },
+  { name: "Kwale", region: "Coast", lat: -4.1816, lng: 39.4606 },
+  { name: "Kilifi", region: "Coast", lat: -3.6333, lng: 39.85 },
+  { name: "Tana River", region: "Coast", lat: -1.4903, lng: 40.0301 },
+  { name: "Lamu", region: "Coast", lat: -2.2717, lng: 40.902 },
+  { name: "Taita-Taveta", region: "Coast", lat: -3.3963, lng: 38.5595 },
+  { name: "Garissa", region: "North Eastern", lat: -0.4569, lng: 39.6583 },
+  { name: "Wajir", region: "North Eastern", lat: 1.7471, lng: 40.0573 },
+  { name: "Mandera", region: "North Eastern", lat: 3.9366, lng: 41.867 },
+  { name: "Marsabit", region: "Eastern", lat: 2.3284, lng: 37.9899 },
+  { name: "Isiolo", region: "Eastern", lat: 0.3546, lng: 37.5822 },
+  { name: "Meru", region: "Eastern", lat: 0.047, lng: 37.6556 },
+  { name: "Tharaka-Nithi", region: "Eastern", lat: -0.3031, lng: 37.9946 },
+  { name: "Embu", region: "Eastern", lat: -0.531, lng: 37.45 },
+  { name: "Kitui", region: "Eastern", lat: -1.3667, lng: 38.0167 },
+  { name: "Machakos", region: "Eastern", lat: -1.5177, lng: 37.2634 },
+  { name: "Makueni", region: "Eastern", lat: -1.8038, lng: 37.6244 },
+  { name: "Nyandarua", region: "Central", lat: -0.1833, lng: 36.5 },
+  { name: "Nyeri", region: "Central", lat: -0.4167, lng: 36.95 },
+  { name: "Kirinyaga", region: "Central", lat: -0.6667, lng: 37.3833 },
+  { name: "Murang'a", region: "Central", lat: -0.7167, lng: 37.15 },
+  { name: "Kiambu", region: "Central", lat: -1.1714, lng: 36.8356 },
+  { name: "Turkana", region: "Rift Valley", lat: 3.1167, lng: 35.6 },
+  { name: "West Pokot", region: "Rift Valley", lat: 1.7333, lng: 35.3833 },
+  { name: "Samburu", region: "Rift Valley", lat: 1.1, lng: 36.95 },
+  { name: "Trans Nzoia", region: "Rift Valley", lat: 1.0167, lng: 34.95 },
+  { name: "Uasin Gishu", region: "Rift Valley", lat: 0.5167, lng: 35.2833 },
+  { name: "Elgeyo-Marakwet", region: "Rift Valley", lat: 0.8, lng: 35.4833 },
+  { name: "Nandi", region: "Rift Valley", lat: 0.1833, lng: 35.1 },
+  { name: "Baringo", region: "Rift Valley", lat: 0.4667, lng: 35.9667 },
+  { name: "Laikipia", region: "Rift Valley", lat: 0.2, lng: 36.8 },
+  { name: "Nakuru", region: "Rift Valley", lat: -0.3031, lng: 36.08 },
+  { name: "Narok", region: "Rift Valley", lat: -1.0833, lng: 35.8667 },
+  { name: "Kajiado", region: "Rift Valley", lat: -1.85, lng: 36.7833 },
+  { name: "Kericho", region: "Rift Valley", lat: -0.3667, lng: 35.2833 },
+  { name: "Bomet", region: "Rift Valley", lat: -0.7833, lng: 35.3417 },
+  { name: "Kakamega", region: "Western", lat: 0.2833, lng: 34.75 },
+  { name: "Vihiga", region: "Western", lat: 0.0667, lng: 34.7167 },
+  { name: "Bungoma", region: "Western", lat: 0.5667, lng: 34.5667 },
+  { name: "Busia", region: "Western", lat: 0.4608, lng: 34.1115 },
+  { name: "Siaya", region: "Nyanza", lat: 0.0667, lng: 34.2833 },
+  { name: "Kisumu", region: "Nyanza", lat: -0.0917, lng: 34.768 },
+  { name: "Homa Bay", region: "Nyanza", lat: -0.5273, lng: 34.4571 },
+  { name: "Migori", region: "Nyanza", lat: -1.0634, lng: 34.4731 },
+  { name: "Kisii", region: "Nyanza", lat: -0.6817, lng: 34.768 },
+  { name: "Nyamira", region: "Nyanza", lat: -0.5633, lng: 34.9358 },
+  { name: "Nairobi", region: "Nairobi", lat: -1.2921, lng: 36.8219 },
+];
