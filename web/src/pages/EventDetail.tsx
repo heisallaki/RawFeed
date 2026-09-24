@@ -3,6 +3,8 @@ import { Link, useParams } from "react-router-dom";
 import { fetchEvent } from "../lib/api";
 import { RawFeedEventDetail } from "../lib/types";
 import { Badge } from "../components/Badge";
+import { useSEO } from "../hooks/useSEO";
+import { DEFAULT_DESCRIPTION, buildEventJsonLd } from "../lib/seo";
 
 export function EventDetail() {
   const { id } = useParams<{ id: string }>();
@@ -17,6 +19,14 @@ export function EventDetail() {
       .catch(() => setError("Could not load this event."))
       .finally(() => setLoading(false));
   }, [id]);
+
+  useSEO({
+    title: event ? event.title : "Event",
+    description: event ? event.why_it_matters || event.summary || event.title : DEFAULT_DESCRIPTION,
+    path: `/events/${id ?? ""}`,
+    type: "article",
+    jsonLd: event ? buildEventJsonLd(event) : undefined,
+  });
 
   if (loading) return <p style={{ margin: "2rem" }}>Loading...</p>;
   if (error || !event) return <p style={{ margin: "2rem" }}>{error || "Event not found."}</p>;

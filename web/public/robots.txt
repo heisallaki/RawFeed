@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /login
+Disallow: /register
+Disallow: /verify-email
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /settings
+Disallow: /admin
+
+Sitemap: https://rawfeed-news.vercel.app/sitemap.xml
