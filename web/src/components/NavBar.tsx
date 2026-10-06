@@ -13,19 +13,59 @@ export function NavBar() {
   const { user, loading, logout } = useAuth();
   const navigate = useNavigate();
   const [menuOpen, setMenuOpen] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
+  const mobileNavRef = useRef<HTMLDivElement>(null);
+  const hamburgerRef = useRef<HTMLButtonElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setMenuOpen(false);
       }
+      if (
+        mobileNavRef.current &&
+        !mobileNavRef.current.contains(event.target as Node) &&
+        hamburgerRef.current &&
+        !hamburgerRef.current.contains(event.target as Node)
+      ) {
+        setMobileNavOpen(false);
+      }
+    }
+    function handleEscape(event: KeyboardEvent) {
+      if (event.key === "Escape") {
+        setMenuOpen(false);
+        setMobileNavOpen(false);
+      }
     }
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    document.addEventListener("keydown", handleEscape);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+      document.removeEventListener("keydown", handleEscape);
+    };
   }, []);
 
+  useEffect(() => {
+    document.body.style.overflow = mobileNavOpen ? "hidden" : "";
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [mobileNavOpen]);
+
   const initial = user?.email?.charAt(0).toUpperCase() || "?";
+
+  const closeMobileNav = () => setMobileNavOpen(false);
+
+  const toggleMobileNav = () => {
+    setMenuOpen(false);
+    setMobileNavOpen((open) => !open);
+  };
+
+  const toggleAccountMenu = () => {
+    setMobileNavOpen(false);
+    setMenuOpen((open) => !open);
+  };
 
   return (
     <nav
@@ -56,11 +96,24 @@ export function NavBar() {
         )}
       </div>
 
+      <button
+        ref={hamburgerRef}
+        className="navbar-hamburger"
+        onClick={toggleMobileNav}
+        aria-label="Toggle navigation menu"
+        aria-expanded={mobileNavOpen}
+        aria-controls="mobile-nav-panel"
+      >
+        <span />
+        <span />
+        <span />
+      </button>
+
       {!loading &&
         (user ? (
           <div ref={menuRef} className="navbar-auth" style={{ position: "relative", flexShrink: 0 }}>
             <button
-              onClick={() => setMenuOpen((open) => !open)}
+              onClick={toggleAccountMenu}
               className="nav-avatar"
               aria-label={`Account menu for ${user.email}`}
               aria-expanded={menuOpen}
@@ -111,6 +164,38 @@ export function NavBar() {
             </NavLink>
           </div>
         ))}
+
+      <div
+        id="mobile-nav-panel"
+        ref={mobileNavRef}
+        role="menu"
+        aria-hidden={!mobileNavOpen}
+        className={`glass-panel mobile-nav-panel${mobileNavOpen ? " open" : ""}`}
+      >
+        {LINKS.map((link) => (
+          <NavLink
+            key={link.to}
+            to={link.to}
+            role="menuitem"
+            className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
+            onClick={closeMobileNav}
+          >
+            {link.label}
+          </NavLink>
+        ))}
+        {user?.is_admin && (
+          <NavLink
+            to="/admin"
+            role="menuitem"
+            className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
+            onClick={closeMobileNav}
+          >
+            Admin
+          </NavLink>
+        )}
+      </div>
+
+      {mobileNavOpen && <div className="mobile-nav-backdrop" onClick={closeMobileNav} />}
     </nav>
   );
 }
