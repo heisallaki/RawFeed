@@ -15,20 +15,14 @@ export function NavBar() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [mobileNavOpen, setMobileNavOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
-  const mobileNavRef = useRef<HTMLDivElement>(null);
-  const hamburgerRef = useRef<HTMLButtonElement>(null);
+  const mobileWidgetRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
       if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
         setMenuOpen(false);
       }
-      if (
-        mobileNavRef.current &&
-        !mobileNavRef.current.contains(event.target as Node) &&
-        hamburgerRef.current &&
-        !hamburgerRef.current.contains(event.target as Node)
-      ) {
+      if (mobileWidgetRef.current && !mobileWidgetRef.current.contains(event.target as Node)) {
         setMobileNavOpen(false);
       }
     }
@@ -54,96 +48,152 @@ export function NavBar() {
   }, [mobileNavOpen]);
 
   const initial = user?.email?.charAt(0).toUpperCase() || "?";
-
   const closeMobileNav = () => setMobileNavOpen(false);
 
-  const toggleMobileNav = () => {
-    setMenuOpen(false);
-    setMobileNavOpen((open) => !open);
-  };
-
-  const toggleAccountMenu = () => {
-    setMobileNavOpen(false);
-    setMenuOpen((open) => !open);
-  };
-
   return (
-    <nav
-      className="glass-panel navbar"
-      style={{
-        position: "relative",
-        zIndex: 100,
-        display: "flex",
-        alignItems: "center",
-        gap: "1rem",
-        padding: "0.75rem 1.25rem",
-        margin: "1rem",
-        flexWrap: "wrap",
-      }}
-    >
-      <span className="brand-title navbar-brand">RawFeed</span>
-
-      <div className="navbar-links" style={{ display: "flex", flex: "1 1 auto", minWidth: 0, justifyContent: "space-evenly", flexWrap: "wrap" }}>
-        {LINKS.map((link) => (
-          <NavLink key={link.to} to={link.to} className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}>
-            {link.label}
-          </NavLink>
-        ))}
-        {user?.is_admin && (
-          <NavLink to="/admin" className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}>
-            Admin
-          </NavLink>
-        )}
-      </div>
-
-      <button
-        ref={hamburgerRef}
-        className="navbar-hamburger"
-        onClick={toggleMobileNav}
-        aria-label="Toggle navigation menu"
-        aria-expanded={mobileNavOpen}
-        aria-controls="mobile-nav-panel"
+    <>
+      <nav
+        className="glass-panel navbar navbar-desktop"
+        style={{
+          position: "relative",
+          zIndex: 100,
+          display: "flex",
+          alignItems: "center",
+          gap: "1rem",
+          padding: "0.75rem 1.25rem",
+          margin: "1rem",
+          flexWrap: "wrap",
+        }}
       >
-        <span />
-        <span />
-        <span />
-      </button>
+        <span className="brand-title navbar-brand">RawFeed</span>
 
-      {!loading &&
-        (user ? (
-          <div ref={menuRef} className="navbar-auth" style={{ position: "relative", flexShrink: 0 }}>
-            <button
-              onClick={toggleAccountMenu}
-              className="nav-avatar"
-              aria-label={`Account menu for ${user.email}`}
-              aria-expanded={menuOpen}
+        <div className="navbar-links" style={{ display: "flex", flex: "1 1 auto", minWidth: 0, justifyContent: "space-evenly", flexWrap: "wrap" }}>
+          {LINKS.map((link) => (
+            <NavLink key={link.to} to={link.to} className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}>
+              {link.label}
+            </NavLink>
+          ))}
+          {user?.is_admin && (
+            <NavLink to="/admin" className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}>
+              Admin
+            </NavLink>
+          )}
+        </div>
+
+        {!loading &&
+          (user ? (
+            <div ref={menuRef} className="navbar-auth" style={{ position: "relative", flexShrink: 0 }}>
+              <button
+                onClick={() => setMenuOpen((open) => !open)}
+                className="nav-avatar"
+                aria-label={`Account menu for ${user.email}`}
+                aria-expanded={menuOpen}
+              >
+                {initial}
+              </button>
+              {menuOpen && (
+                <div className="glass-panel dropdown-menu">
+                  <p
+                    style={{
+                      margin: "0 0 0.5rem 0",
+                      fontSize: "0.8rem",
+                      color: "var(--color-text-muted)",
+                      wordBreak: "break-all",
+                    }}
+                  >
+                    {user.email}
+                  </p>
+                  <NavLink
+                    to="/settings"
+                    className="nav-link"
+                    style={{ display: "block", marginBottom: "0.35rem" }}
+                    onClick={() => setMenuOpen(false)}
+                  >
+                    Settings
+                  </NavLink>
+                  <button
+                    onClick={() => {
+                      logout();
+                      setMenuOpen(false);
+                      navigate("/");
+                    }}
+                    className="nav-link"
+                    style={{ width: "100%", textAlign: "left", background: "none", border: "none" }}
+                  >
+                    Log out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="navbar-auth" style={{ display: "flex", gap: "0.5rem", flexShrink: 0 }}>
+              <NavLink to="/login" className="nav-link">
+                Log in
+              </NavLink>
+              <NavLink to="/register" className="nav-link accent-bg" style={{ color: "#fff" }}>
+                Sign up
+              </NavLink>
+            </div>
+          ))}
+      </nav>
+
+      <div ref={mobileWidgetRef} className="glass-panel mobile-menu-widget">
+        <div className="mobile-menu-header">
+          <span className="brand-title">RawFeed</span>
+          <button
+            className="navbar-hamburger"
+            onClick={() => setMobileNavOpen((open) => !open)}
+            aria-label="Toggle navigation menu"
+            aria-expanded={mobileNavOpen}
+            aria-controls="mobile-nav-panel"
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
+
+        <div
+          id="mobile-nav-panel"
+          role="menu"
+          aria-hidden={!mobileNavOpen}
+          className={`mobile-nav-panel${mobileNavOpen ? " open" : ""}`}
+        >
+          {LINKS.map((link) => (
+            <NavLink
+              key={link.to}
+              to={link.to}
+              role="menuitem"
+              className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
+              onClick={closeMobileNav}
             >
-              {initial}
-            </button>
-            {menuOpen && (
-              <div className="glass-panel dropdown-menu">
-                <p
-                  style={{
-                    margin: "0 0 0.5rem 0",
-                    fontSize: "0.8rem",
-                    color: "var(--color-text-muted)",
-                    wordBreak: "break-all",
-                  }}
-                >
-                  {user.email}
-                </p>
-                <NavLink
-                  to="/settings"
-                  className="nav-link"
-                  style={{ display: "block", marginBottom: "0.35rem" }}
-                  onClick={() => setMenuOpen(false)}
-                >
+              {link.label}
+            </NavLink>
+          ))}
+          {user?.is_admin && (
+            <NavLink
+              to="/admin"
+              role="menuitem"
+              className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
+              onClick={closeMobileNav}
+            >
+              Admin
+            </NavLink>
+          )}
+
+          <div className="mobile-nav-divider" />
+
+          {!loading &&
+            (user ? (
+              <>
+                <p className="mobile-nav-email">{user.email}</p>
+                <NavLink to="/settings" role="menuitem" className="nav-link" onClick={closeMobileNav}>
                   Settings
                 </NavLink>
                 <button
                   onClick={() => {
                     logout();
-                    setMenuOpen(false);
+                    closeMobileNav();
                     navigate("/");
                   }}
                   className="nav-link"
@@ -151,51 +201,27 @@ export function NavBar() {
                 >
                   Log out
                 </button>
-              </div>
-            )}
-          </div>
-        ) : (
-          <div className="navbar-auth" style={{ display: "flex", gap: "0.5rem", flexShrink: 0 }}>
-            <NavLink to="/login" className="nav-link">
-              Log in
-            </NavLink>
-            <NavLink to="/register" className="nav-link accent-bg" style={{ color: "#fff" }}>
-              Sign up
-            </NavLink>
-          </div>
-        ))}
-
-      <div
-        id="mobile-nav-panel"
-        ref={mobileNavRef}
-        role="menu"
-        aria-hidden={!mobileNavOpen}
-        className={`glass-panel mobile-nav-panel${mobileNavOpen ? " open" : ""}`}
-      >
-        {LINKS.map((link) => (
-          <NavLink
-            key={link.to}
-            to={link.to}
-            role="menuitem"
-            className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
-            onClick={closeMobileNav}
-          >
-            {link.label}
-          </NavLink>
-        ))}
-        {user?.is_admin && (
-          <NavLink
-            to="/admin"
-            role="menuitem"
-            className={({ isActive }) => `nav-link${isActive ? " active" : ""}`}
-            onClick={closeMobileNav}
-          >
-            Admin
-          </NavLink>
-        )}
+              </>
+            ) : (
+              <>
+                <NavLink to="/login" role="menuitem" className="nav-link" onClick={closeMobileNav}>
+                  Log in
+                </NavLink>
+                <NavLink
+                  to="/register"
+                  role="menuitem"
+                  className="nav-link accent-bg"
+                  style={{ color: "#fff" }}
+                  onClick={closeMobileNav}
+                >
+                  Sign up
+                </NavLink>
+              </>
+            ))}
+        </div>
       </div>
 
       {mobileNavOpen && <div className="mobile-nav-backdrop" onClick={closeMobileNav} />}
-    </nav>
+    </>
   );
 }

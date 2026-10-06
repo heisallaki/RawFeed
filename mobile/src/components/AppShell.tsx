@@ -1,7 +1,7 @@
 import { ReactNode } from "react";
 import { View } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-import { TabBar } from "./TabBar";
+import { HamburgerMenu } from "./HamburgerMenu";
 
 interface AppShellProps {
   children: ReactNode;
@@ -13,7 +13,7 @@ export function AppShell({ children, active }: AppShellProps) {
   return (
     <View style={{ flex: 1 }}>
       <View style={{ flex: 1 }}>{children}</View>
-      <TabBar activeRoute={active} onNavigate={(name) => navigation.navigate(name)} />
+      <HamburgerMenu activeRoute={active} onNavigate={(name) => navigation.navigate(name)} />
     </View>
   );
 }
