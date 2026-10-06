@@ -1,4 +1,4 @@
-![RawFeed preview](docs/preview.png)
+![RawFeed preview](preview.png)
 
 ## RawFeed
 
