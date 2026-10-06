@@ -57,7 +57,6 @@ export function NavBar() {
         style={{
           position: "relative",
           zIndex: 100,
-          display: "flex",
           alignItems: "center",
           gap: "1rem",
           padding: "0.75rem 1.25rem",

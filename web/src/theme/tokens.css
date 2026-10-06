@@ -177,6 +177,10 @@ button:active {
   cursor: pointer;
 }
 
+.navbar-desktop {
+  display: flex;
+}
+
 .navbar-brand {
   flex-shrink: 0;
 }
