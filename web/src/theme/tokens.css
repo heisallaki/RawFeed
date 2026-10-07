@@ -302,6 +302,10 @@ button:active {
     -webkit-backdrop-filter: blur(2px);
     z-index: 998;
   }
+
+  .app-content {
+    padding-top: 5rem;
+  }
 }
 
 .brand-title {

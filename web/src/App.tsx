@@ -29,7 +29,7 @@ export default function App() {
             <div style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}>
               <RouteSeo />
               <NavBar />
-              <div style={{ flex: "1 1 auto", display: "flex", flexDirection: "column" }}>
+              <div className="app-content" style={{ flex: "1 1 auto", display: "flex", flexDirection: "column" }}>
                 <Routes>
                   <Route path="/" element={<Home />} />
                   <Route path="/globe" element={<Globe />} />
